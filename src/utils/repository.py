@@ -22,14 +22,14 @@ class Repository:
                 ref_content = self.file_control.load_dict_from_file(
                     absolute_path)
                 spec = resolve_once(
-                    file, ref_content['paths'], self.file_control)
+                    absolute_path, ref_content['paths'], self.file_control)
                 for path in spec:
                     method = list(spec[path].keys())
                     collection.add(
                         Route(
                             method[0].upper(),
                             path,
-                            file,
+                            absolute_path,
                             spec[path][method[0]]
                         ))
         else:
