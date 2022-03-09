@@ -17,21 +17,33 @@ class Repository:
             return
         if '$ref' in content['paths']:
             for value in content['paths']:
-                absolute_path = os.path.join(
-                    os.path.dirname(file), content['paths'][value])
-                ref_content = self.file_control.load_dict_from_file(
-                    absolute_path)
-                spec = resolve_once(
-                    absolute_path, ref_content['paths'], self.file_control)
-                for path in spec:
-                    method = list(spec[path].keys())
-                    collection.add(
-                        Route(
-                            method[0].upper(),
-                            path,
-                            absolute_path,
-                            spec[path][method[0]]
-                        ))
+                if value == '$ref':
+                    absolute_path = os.path.join(
+                        os.path.dirname(file), content['paths'][value])
+                    ref_content = self.file_control.load_dict_from_file(
+                        absolute_path)
+                    spec = resolve_once(
+                        absolute_path, ref_content, self.file_control)
+                    for path in spec:
+                        method = list(spec[path].keys())
+                        collection.add(
+                            Route(
+                                method[0].upper(),
+                                path,
+                                absolute_path,
+                                spec[path][method[0]]
+                            ))
+                else:
+                    spec = resolve_once(
+                        file, content['paths'][value], self.file_control)
+                    for method in spec:
+                        collection.add(
+                            Route(
+                                method.upper(),
+                                value,
+                                file,
+                                spec[method]
+                            ))
         else:
             for path, spec in content['paths'].items():
                 spec = resolve_once(file, spec, self.file_control)
