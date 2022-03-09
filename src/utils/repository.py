@@ -7,7 +7,7 @@ from src.models.route_collection import RouteCollection
 
 class Repository:
 
-    def __init__(self, file_path, file_control = FileControl()):
+    def __init__(self, file_path, file_control=FileControl()):
         self.file_control = file_control
         self.routes = self.generate(file_path)
 
@@ -15,16 +15,34 @@ class Repository:
         content = self.file_control.load_dict_from_file(file)
         if 'paths' not in content or len(content['paths']) == 0:
             return
-        for path, spec in content['paths'].items():
-            spec = resolve_once(file, spec, self.file_control)
-            for method in spec:
-                collection.add(
-                    Route(
-                        method.upper(), 
-                        path, 
-                        file, 
-                        spec[method]
-                    ))
+        if '$ref' in content['paths']:
+            for value in content['paths']:
+                absolute_path = os.path.join(
+                    os.path.dirname(file), content['paths'][value])
+                ref_content = self.file_control.load_dict_from_file(
+                    absolute_path)
+                spec = resolve_once(
+                    file, ref_content['paths'], self.file_control)
+                for path in spec:
+                    method = list(spec[path].keys())
+                    collection.add(
+                        Route(
+                            method[0].upper(),
+                            path,
+                            file,
+                            spec[path][method[0]]
+                        ))
+        else:
+            for path, spec in content['paths'].items():
+                spec = resolve_once(file, spec, self.file_control)
+                for method in spec:
+                    collection.add(
+                        Route(
+                            method.upper(),
+                            path,
+                            file,
+                            spec[method]
+                        ))
 
     def generate(self, file_path):
         collection = RouteCollection()
