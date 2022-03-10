@@ -13,7 +13,10 @@ def run_bundle(spec_paths, filename=None):
     elif filename is not None:
         header_file = filename
     try:
-        data = repository.file_control.load_dict_from_file(header_file)
+        if spec_paths[0] != header_file:
+            data = repository.file_control.load_dict_from_file(spec_paths[0])
+        else:
+            data = repository.file_control.load_dict_from_file(header_file)
         if isinstance(data, dict):
             data['paths'] = {}
             #data.pop('components', None)

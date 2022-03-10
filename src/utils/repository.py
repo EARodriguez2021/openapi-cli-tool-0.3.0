@@ -15,9 +15,9 @@ class Repository:
         content = self.file_control.load_dict_from_file(file)
         if 'paths' not in content or len(content['paths']) == 0:
             return
-        if '$ref' in content['paths']:
+        if len([val for key, val in content['paths'].items() if '$' in key]) > 0:
             for value in content['paths']:
-                if value == '$ref':
+                if '$' in value and 'group' in value:
                     absolute_path = os.path.join(
                         os.path.dirname(file), content['paths'][value])
                     ref_content = self.file_control.load_dict_from_file(
