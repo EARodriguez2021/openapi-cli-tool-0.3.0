@@ -25,14 +25,15 @@ class Repository:
                     spec = resolve_once(
                         absolute_path, ref_content, self.file_control)
                     for path in spec:
-                        method = list(spec[path].keys())
-                        collection.add(
-                            Route(
-                                method[0].upper(),
-                                path,
-                                absolute_path,
-                                spec[path][method[0]]
-                            ))
+                        for method in spec[path]:
+                            collection.add(
+                                Route(
+                                    method.upper(),
+                                    path,
+                                    absolute_path,
+                                    spec[path][method]
+                                )
+                            )
                 else:
                     spec = resolve_once(
                         file, content['paths'][value], self.file_control)
