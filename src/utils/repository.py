@@ -19,7 +19,7 @@ class Repository:
             for value in content['paths']:
                 if '$' in value and 'group' in value:
                     absolute_path = os.path.join(
-                        os.path.dirname(file), content['paths'][value])
+                        os.path.dirname(file), content['paths'][value]['$ref'])
                     ref_content = self.file_control.load_dict_from_file(
                         absolute_path)
                     spec = resolve_once(
